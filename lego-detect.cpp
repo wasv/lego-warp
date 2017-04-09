@@ -159,11 +159,7 @@ int main(int argc, char** argv)
         findLargestContour(image, object);
         getAnchors(object, src_anchors);
 
-//        cout << src_anchors << endl;
-//        cout << dst_anchors << endl;
-
         Mat transform = findHomography(src_anchors,dst_anchors);
-//        Mat transform = getPerspectiveTransform(src, dst);
         warpPerspective(image, out_image, transform, out_image.size());
 
         const Point* p = &object[0];
@@ -176,6 +172,9 @@ int main(int argc, char** argv)
 
         imshow(wndname,image);
         imshow("Result",out_image);
+        char filename[14];
+        sprintf(filename,"result-%03d.jpg",i);
+        imwrite(filename, out_image);
 
         int c = waitKey();
         if( (char)c == 27 )
