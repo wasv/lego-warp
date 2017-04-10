@@ -1,10 +1,12 @@
 // The "Square Detector" program.
 // It loads several images sequentially and tries to find squares in
 // each image
+// Tutorial from OpenCV repository.
+//  Modified to use an arbitrary list of images by William A Stevens V
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -18,7 +20,7 @@ static void help()
     cout <<
     "\nA program using pyramid scaling, Canny, contours, contour simpification and\n"
     "memory storage (it's got it all folks) to find\n"
-    "squares in a list of images pic1-6.png\n"
+    "squares in a list of images \n"
     "Returns sequence of squares detected on the image.\n"
     "the sequence is stored in the specified memory storage\n"
     "Call:\n"
@@ -103,7 +105,6 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
                     fabs(contourArea(Mat(approx))) > 1000 &&
                     isContourConvex(Mat(approx)) )
                 {
-                    Rect boundRect = boundingRect(Mat(contours[i]));
                     double maxCosine = 0;
 
                     for( int j = 2; j < 5; j++ )

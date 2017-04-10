@@ -1,7 +1,9 @@
 /**
- * @function findContours_Demo.cpp
- * @brief Demo code to find contours in an image
- * @author OpenCV team
+ * Finds contours at various threshold levels.
+ * Used to find correct thresholding technique
+ *  for green LEGO backplates.
+ * Based on OpenCV tutorial code.
+ *  Modified by William A Stevens V.
  */
 
 #include <opencv2/highgui/highgui.hpp>
@@ -19,9 +21,6 @@ Mat src_gray;
 RNG rng(12345);
 const int steps = 5;
 
-/// Function header
-void thresh_callback(int, void* );
-
 /**
  * @function main
  */
@@ -30,10 +29,13 @@ int main( int, char** argv )
     /// Load source image and convert it to gray
     src = imread( argv[1], 1 );
 
-    /// Convert image to gray and blur it
+    /// Resize the image to more managable size.
     resize(src, src, Size((1000.0/src.rows)*src.cols,1000));
+
+    /// Convert image to grayscale using formula green - avg(red,blue).
+    ///  This isolates green and discounts yellow and cyan.
     split(src, channel);
-    src_gray = 255 - (channel[1] - (channel[0] + channel[2])/2);
+    src_gray = (channel[1] - (channel[0] + channel[2])/2);
     blur( src_gray, src_gray, Size(3,3) );
 
     /// Create Window
@@ -83,6 +85,7 @@ int main( int, char** argv )
             }
         }
 
+        /// Display result
         namedWindow( "Thresh Contours", WINDOW_AUTOSIZE );
         imshow( "Thresh Contours", thresh_drawing );
 
