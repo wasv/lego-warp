@@ -1,6 +1,5 @@
-// The "Square Detector" program.
-// It loads several images sequentially and tries to find squares in
-// each image
+// Detects a green lego backplane,
+//  then crops and warps the image to isolate the backplane.
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
