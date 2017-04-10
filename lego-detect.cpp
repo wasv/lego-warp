@@ -56,7 +56,6 @@ static void findLargestContour( const Mat& image, vector<Point> &maxContour )
     //blur( gray0, gray0, Size(3,3) );
 
     inRange(gray0, 15, 255, gray);
-    imshow("Gray", gray);
 
     // find contours and store them all as a list
     findContours(gray, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
@@ -80,60 +79,46 @@ static void findLargestContour( const Mat& image, vector<Point> &maxContour )
 }
 
 
-// the function draws all the squares in the image
-static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
-{
-    for( size_t i = 0; i < squares.size(); i++ )
-    {
-        const Point* p = &squares[i][0];
-        int n = (int)squares[i].size();
-        polylines(image, &p, &n, 1, true, Scalar(0,255,0), 3, CV_AA);
-    }
-
-    imshow(wndname, image);
-}
-
 static void getAnchors(vector<Point> points, vector<Point2f> &anchors) {
     anchors.clear();
 
     Point tl(0,0);
     Point br(0,0);
 
-    int minarea = INT_MAX;
-    int maxarea = INT_MIN;
+    int mindist = INT_MAX;
+    int maxdist = INT_MIN;
     for( int i = 0; i < points.size(); i++) {
-        int area = points[i].x * points[i].y;
-        if(area > maxarea) {
-            maxarea = area;
+        int dist = norm(points[i]);
+        if(dist > maxdist) {
+            maxdist = dist;
             tl = points[i];
         }
-        if(area < minarea) {
-            minarea = area;
+        if(dist < mindist) {
+            mindist = dist;
             br = points[i];
         }
     }
-    int avgx = (tl.x+br.x)/2;
-    int avgy = (tl.y+br.y)/2;
+    Point mid((tl.x+br.x)/2,(tl.y+br.y)/2);
 
-    Point tr(avgx,avgy);
-    Point bl(avgx,avgy);
+    Point tr(mid.x,mid.y);
+    Point bl(mid.x,mid.y);
     int maxareatr = INT_MIN;
     int maxareabl = INT_MIN;
     for( int i = 0; i < points.size(); i++) {
-        int area = abs(points[i].x-avgx) * abs(points[i].y-avgy);
-        if(points[i].x < avgx && points[i].y > avgy && area > maxareabl) {
+        int area = abs(points[i].x-mid.x)*abs(points[i].y-mid.y);
+        if(points[i].x < mid.x && points[i].y > mid.y && area > maxareabl) {
             maxareabl = area;
             bl = points[i];
         }
-        if(points[i].x > avgx && points[i].y < avgy && area > maxareatr) {
+        if(points[i].x > mid.x && points[i].y < mid.y && area > maxareatr) {
             maxareatr = area;
             tr = points[i];
         }
     }
-    anchors.push_back(tl);
-    anchors.push_back(tr);
     anchors.push_back(br);
     anchors.push_back(bl);
+    anchors.push_back(tl);
+    anchors.push_back(tr);
 }
 
 int main(int argc, char** argv)
@@ -145,19 +130,27 @@ int main(int argc, char** argv)
     {
         vector<Point> object;
         vector<Point2f> src_anchors;
-        vector<Point2f> dst_anchors = {Point(500,1000), Point(500,0), Point(0,0), Point(0,1000)};
+        vector<Point2f> dst_anchors;
 
         Mat image = imread(argv[i], 1);
-        Mat out_image = Mat::zeros( Size(500,1000), image.type() );
+        Mat out_image;
         if( image.empty() )
         {
             cout << "Couldn't load " << argv[i] << endl;
             continue;
         }
 
-        resize(image, image, Size((1000.0/image.rows)*image.cols,1000));
+        //resize(image, image, Size((1000.0/image.rows)*image.cols,1000));
         findLargestContour(image, object);
         getAnchors(object, src_anchors);
+
+        int width  = norm(src_anchors[0] - src_anchors[1]);
+        int height = norm(src_anchors[1] - src_anchors[2]);
+        out_image  = Mat::zeros( Size(height,width), image.type() );
+        dst_anchors.push_back(Point(0,0));
+        dst_anchors.push_back(Point(0,width));
+        dst_anchors.push_back(Point(height,width));
+        dst_anchors.push_back(Point(height,0));
 
         Mat transform = findHomography(src_anchors,dst_anchors);
         warpPerspective(image, out_image, transform, out_image.size());
@@ -166,15 +159,19 @@ int main(int argc, char** argv)
         int n = (int)object.size();
         polylines(image, &p, &n, 1, true, Scalar(0,0,255), 3, CV_AA);
 
-        for(int i = 0; i < src_anchors.size(); i++) {
-            circle(image, src_anchors[i], 5, Scalar(255,0,0), 3);
+        circle(image, src_anchors[0], 5, Scalar(0,255,0), 5);
+        for(int i = 1; i < src_anchors.size(); i++) {
+            circle(image, src_anchors[i], 5, Scalar(255,0,0), 5);
         }
 
-        imshow(wndname,image);
-        imshow("Result",out_image);
         char filename[14];
         sprintf(filename,"result-%03d.jpg",i);
         imwrite(filename, out_image);
+
+        resize(image, image, Size((1000.0/image.rows)*image.cols,1000));
+        resize(out_image, out_image, Size((500.0/out_image.rows)*out_image.cols,500));
+        imshow(wndname,image);
+        imshow("Result",out_image);
 
         int c = waitKey();
         if( (char)c == 27 )
