@@ -12,3 +12,6 @@ target_link_libraries( contours ${OpenCV_LIBS} )
 
 add_executable( lego-detect src/lego-detect.cpp )
 target_link_libraries( lego-detect ${OpenCV_LIBS} )
+
+add_executable( sched-read src/sched-read )
+target_link_libraries( sched-read ${OpenCV_LIBS} )

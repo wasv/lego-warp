@@ -1,4 +1,4 @@
-// Detects a green lego backplane,
+// Detects a green LEGO backplane,
 //  then crops and warps the image to isolate the backplane.
 
 #include <opencv2/core/core.hpp>
@@ -7,7 +7,6 @@
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
-#include <math.h>
 #include <string.h>
 #include <climits>
 
@@ -17,11 +16,11 @@ using namespace std;
 static void help()
 {
     cout <<
-    "Using OpenCV version %s\n" << CV_VERSION << "\n" << endl;
+    "Using OpenCV version " << CV_VERSION << endl << endl;
 }
 
 
-const char* wndname = "Lego Panel Detection";
+const char* wndname = "LEGO Panel Detection";
 
 // returns sequence of squares detected on the image.
 // the sequence is stored in the specified memory storage
