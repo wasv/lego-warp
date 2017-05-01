@@ -9,8 +9,8 @@
 #include <string.h>
 #include <climits>
 
-#define XRES 32
-#define YRES 64
+#define XRES 64
+#define YRES 32
 
 using namespace cv;
 using namespace std;
