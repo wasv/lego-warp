@@ -67,10 +67,9 @@ static Color getCellColor( const Mat& image, const Rect& cell) {
     int hue = huePt.y;
     int sat = satPt.y;
 
-    cerr << s_hist << endl;
-    cerr << 'H' << hue << 'S' << sat << ' ' << cell << endl;
+//    cerr << 'H' << hue << 'S' << sat << ' ' << cell << endl;
 
-    if(sat == 0 || sat == 1)
+    if(sat <= 2)
     {
         return WHITE;
     }
@@ -121,7 +120,7 @@ int main( int argc, char** argv) {
             cout << "Couldn't load " << argv[i] << endl;
             continue;
         }
-    
+
         cout << argv[i] << endl;
         Size cellSize = Size(image.size().width/XRES, image.size().height/YRES);
         // Generate grid
