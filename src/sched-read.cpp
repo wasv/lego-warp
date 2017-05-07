@@ -67,7 +67,7 @@ static Color getCellColor( const Mat& image, const Rect& cell) {
     int hue = huePt.y;
     int sat = satPt.y;
 
-//    cerr << 'H' << hue << 'S' << sat << ' ' << cell << endl;
+//    cerr << 'H' << hue << 'S' << sat << ' ' << cell << endl; // Used for debugging.
 
     if(sat <= 2)
     {
@@ -123,11 +123,12 @@ int main( int argc, char** argv) {
 
         cout << argv[i] << endl;
         Size cellSize = Size(image.size().width/XRES, image.size().height/YRES);
-        // Generate grid
+        // Detect color for each cell.
         for( int y = 0; y < YRES; y += 1)
         {
             for( int x = 0; x < XRES; x += 1)
             {
+                // Print cell color.
                 Rect cell = Rect(Point(x*cellSize.width,y*cellSize.height), cellSize);
                 Color color = getCellColor(image, cell);
                 cout << color;
